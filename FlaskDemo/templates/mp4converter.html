@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> MP4 Converter </title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <h5>MP4 CONVERTER</h5>
+<h1>Convert YouTube Videos in Seconds</h1>
+<p>Our YouTube to MP4 converter tool offers lightning-fast conversion with just a few clicks. Easily download and save videos in high-quality MP4 format for offline viewing anytime, anywhere.</p>
+
+
+<input type="text" id="myInput">
+
+<button id="myButton">Submit</button>
+
+<h1 id="myText"></h1>
+
+
+
+<script>
+    $(document).ready(function(){
+        $("#myButton").click(function(){
+            var url = $("#myInput").val();
+            $.ajax({
+                url: '/get_video_info',
+                type: 'POST',
+                data: JSON.stringify({url: url}),
+                contentType: 'application/json',
+                success: function(response){
+                    $("#myText").html(
+                        "<p>Title: " + response.title + "</p>" +
+                        "<img src='" + response.thumbnail_url + "' alt='Video thumbnail'>" +
+                        "<p>Duration: " + response.duration + " seconds</p>"
+                    );
+                    for (var resolution in response.streams) {
+                        (function(resolution) {
+                            var button = $("<button>").text("Download " + resolution);
+                            button.click(function() {
+                                window.location.href = response.streams[resolution];
+                            });
+                            $("#myText").append(button);
+                        })(resolution);
+                    }
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+
+</html>
